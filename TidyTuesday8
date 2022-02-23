@@ -1,0 +1,19 @@
+#TidyTuesday2/22
+library(tidyverse)
+library(ggplot2)
+library(geofaucet)
+library(usefunc)
+
+#get Data
+tuesdata <- tidytuesdayR::tt_load('2022-02-22')
+freedom<-tuesdata$freedom
+
+#prep data
+byYear<- freedom %>% group_by(Region_Name,year,Status)%>%summarise(count=n())
+view(byYear)
+
+#create a grouping per 5 years
+plot95_20<-byYear %>% filter(year==1995| year==2000 | year==2005 | year==2010 |year==2015| year==2020) %>% select(count)
+
+#plot per 5 years shaped by Status
+ggplot(byYear,aes(x=byYear$year, y=byYear$count, color=byYear$Region_Name))+geom_point(shape=byYear$Status)+labs(x="Year", y="Counts of status", color= "Regional Name", title= "Changes in the Amount of Freedom Territories by Region", caption = "J. McNeill| data: Freedom House")
