@@ -1,0 +1,36 @@
+#TidyTuesday9
+# Get the Data
+
+# Read in with tidytuesdayR package 
+# Install from CRAN via: install.packages("tidytuesdayR")
+# This loads the readme and all the datasets for the week of interest
+
+# Either ISO-8601 date or year/week works!
+
+tuesdata <- tidytuesdayR::tt_load('2022-03-01')
+tuesdata <- tidytuesdayR::tt_load(2022, week = 9)
+
+stations <- tuesdata$stations
+
+# Or read in the data manually
+
+stations <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-01/stations.csv')
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(scales)
+library(tidylo)
+library(tidytext)
+library(GGally)
+library(geofacet)
+
+
+view(stations)
+Data<- stations%>%select(STATE,FUEL_TYPE_CODE,GROUPS_WITH_ACCESS_CODE,LONGITUDE,LATITUDE,ID,COUNTRY,ACCESS_CODE)
+view(Data)
+
+#PLots
+#Distribute Data
+G1<- ggplot(Data, aes(Data$ACCESS_CODE,fill=Data$FUEL_TYPE_CODE))+geom_bar(position = "dodge", stat="count")
+G2<-Data%>% ggplot(aes(LONGITUDE, LATITUDE, color=STATE))+
+  geom_point(show.legend = F)+coord_fixed(2)+  ggthemes::theme_map()+    ggtitle("Distribution of Fuel Stations Across America and outskirts")
