@@ -1,0 +1,58 @@
+#TidyTuesday10
+# Get the Data
+
+# Read in with tidytuesdayR package 
+# Install from CRAN via: install.packages("tidytuesdayR")
+# This loads the readme and all the datasets for the week of interest
+
+# Either ISO-8601 date or year/week works!
+
+tuesdata <- tidytuesdayR::tt_load('2022-03-08')
+tuesdata <- tidytuesdayR::tt_load(2022, week = 10)
+
+erasmus <- tuesdata$erasmus
+
+# Or read in the data manually
+
+erasmus <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-08/erasmus.csv')
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(ggeffects)
+library(GGally)
+library(tidyverse)
+library(gridExtra)
+library(gtable)
+erasmus
+
+#Break data apart by noticiable variable
+Group_Age<- erasmus%>% group_by(participant_gender)%>%summarise(avg=mean(participant_age))
+View(Group_Age)
+
+#Group variables                                                                   
+Graph_data<- erasmus %>% count(participant_gender, fewer_opportunities, academic_year) 
+view(Graph_data)
+nest_join(Group_Age,Graph_data, by=NULL, copy=FALSE, keep=FALSE,name=NULL)
+
+#Graph some visulizations to highlight certain findings 
+ss<-tableGrob(Group_Age)
+Scat<-ggplot(Group_Age,aes(x=Group_Age$participant_gender, y=Group_Age$avg))+geom_point()+labs(x="Gender", y="Avergae Age",titlee="Visulization of Average") 
+grid.arrange(Scat,ss)
+Dist_By_Year<- ggplot(Graph_data, aes(x=Graph_data$academic_year,y=Graph_data$n, fill=Graph_data$participant_gender))+geom_col(position="dodge") + labs(x="Academic Year",y="Count",fill="Gender", title="Distribution of participants in ERASMUS")
+Dist_By_Year
+
+#Fix some things
+GDF<-slice(Graph_data,n=c(1:12))
+GDM<-slice(Graph_data, n=c(13:24))
+GDU<-slice(Graph_data, n=c(25:35))
+GF<- tableGrob(GDF)
+GM<-tableGrob(GDM)
+GU<-tableGrob(GDU)
+
+#more indepth distributions 
+Uni<-ggplot(GDU, aes(x=GDU$academic_year,y=GDU$n,fill=GDU$fewer_opportunities))+geom_col(position="dodge")+labs(x="Academic Year",y="Count",fill="Fewer Opportunities", title= "Unidentified Gender and opportunities in the ERASMUS")
+grid.arrange(Uni,GU)
+Fem<-ggplot(GDF,aes(x=GDF$academic_year,y=GDF$n,fill=GDF$fewer_opportunities))+geom_col(position="dodge")+labs(x="Academic Year",y="Count",fill="Fewer Opportunities",title="Female Opportunies in the ERASMUS")
+grid.arrange(Fem,GF)
+Mal<- ggplot(GDM, aes(x=GDM$academic_year, y=GDM$n, fill=GDM$fewer_opportunities))+geom_col(position="dodge")+labs(x="Academic Year",y="Count",fill="Fewer Opportunities", title="Male Opportunities in the ERASMUS")
+grid.arrange(Mal,GM)
