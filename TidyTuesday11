@@ -1,0 +1,55 @@
+#TidyTuesday Week 11
+
+# Get the Data
+
+# Read in with tidytuesdayR package 
+# Install from CRAN via: install.packages("tidytuesdayR")
+# This loads the readme and all the datasets for the week of interest
+
+# Either ISO-8601 date or year/week works!
+
+tuesdata <- tidytuesdayR::tt_load('2022-03-15')
+tuesdata <- tidytuesdayR::tt_load(2022, week = 11)
+
+bioc <- tuesdata$bioc
+
+# Or read in the data manually
+
+bioc <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-15/bioc.csv')
+cran <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-15/cran.csv')
+library(dplyr)
+library(tidyverse)
+library(ggplot)
+library(ggthemes)
+library(htmlTable)
+library(vcd)
+library(vcdExtra)
+library(psych)
+library(showtext)
+library(ggtext)
+cran
+
+#view data for bioc
+
+by_package<- bioc%>%group_by(package)
+by_rmd<- bioc%>% group_by(rmd)
+by_rmd%>%tally(sort=TRUE)
+by_package%>%tally(sort=TRUE) #select top 5
+data<- bioc %>% filter(package==c("flowDensity","STATegRa","TCGAbiolinks","proBatch"),date>"2014-01-01")
+view(data)
+
+Data2<- bioc%>%filter(package==c("microbiome","bigPint","ELMER","RCy3"), date>"2014-01-01")
+view(Data2)
+
+#plot
+cols<- c("flowDenisty"="#abd67d", "proBatch"="#c7fffa","STATegRa"="#c7a1d1","TCGAbiolinks"="#ffbff0")
+g1<-ggplot(data, aes(x=data$date,y=data$rmd,color=data$package))+geom_line(size=1)+scale_color_manual(values=fill)
+#add labs, title, adjusments
+g1+labs(x="Date",y="RMD based vignette count", color="package",title="Longevity of most frequent R packages by group and tally commands", subtitle = "data: R flight| by: Jmmcneill20")
+
+#second graph
+g2<- ggplot(Data2, aes(x=Data2$date,y=Data2$rmd, color=Data2$package))+geom_line()
+#cleanup
+g2+labs(x="Date", y="RMD based Vignette Count", color="Package", title= "Longitdue of R packages RMD based on RMD frequency and Tally Commands", subtitle="data: R. flight| by:Jmmcneill20")
+
+#please provide any feedback or provide constructive crisitcm
