@@ -1,0 +1,47 @@
+#Tidy Tuesday Week 23
+library(tidyTuesdayR)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(plotrix)
+# Get the Data
+  # Read in with tidytuesdayR package 
+   # Install from CRAN via: install.packages("tidytuesdayR")
+   # This loads the readme and all the datasets for the week of interest
+   
+   # Either ISO-8601 date or year/week works!
+   
+ tuesdata <- tidytuesdayR::tt_load('2022-06-07')
+ donations <- tuesdata$pride_aggregates
+ donations
+ #view data
+ view(donations)
+ #remove grand total from data
+ donations<- donations %>% slice(c(1:30))
+ view(donations)
+ #data is organized by highest contributions 
+ #create top 15 and bottom 15 
+  donations_top<- donations %>% slice(c(1:15)) 
+  donations_bottom<- donations %>% slice(c(16:30))
+#summarize donations
+  summary(donations_top)
+  summary(donations_bottom)
+  #summarizing shows us the points of interest 
+#slice into top 5 and for graphing 
+  DT5<- donations_top%>% slice(c(1:5))
+  #graphing 
+  #politicians on the X, Money on the Y, companies are dots 
+  MxP<- ggplot(data=DT5, aes(color=DT5$Company, y= DT5$`Total Contributed`, x=DT5$`# of Politicians Contributed to`))+geom_point() 
+  MxP+labs(x="Number of politicians Contributed to", y="Total Money Contributed", color="Company", title="Company's Monitary Donation vs Number of Policiticans Donated too")
+  #top 5 Contributed providers.
+  #More graphs
+  #pie with percentages of the top 5 companies using plotrix
+ slices1<-(DT5$`Total Contributed`)
+ labs1<- (DT5$Company)
+ pct<- round(slices1/sum(slices1)*100)
+ labs1<- paste(labs1,pct)
+ labs1<-paste(labs1,"%",sep="")
+ pie(slices1, labels=labs1, col=rainbow(length(labs1)), main="Top 5 Contributing Companies")
+  #Number of Politicians Each Company Donates Too 
+ ggplot(donations, aes(donations$`# of Politicians Contributed to`,donations$Company))+geom_point()+theme_bw()+labs(y="Company",x="Amount of Politicians Donated to")
+  
